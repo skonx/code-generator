@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -13,6 +14,9 @@ const base = "0123456789_-.AZERTYUIOPMLKJHGFDSQWXCVBNazertyuiopmlkjhgfdsqwxcvbn"
 const path = "/tmp/secret-code/"
 const filename = "password.key"
 const filepath = path + filename
+const defaultCodeSize = 64
+
+var codeSize int
 
 func check(e error) {
 	if e != nil {
@@ -22,7 +26,15 @@ func check(e error) {
 
 func init() {
 
-	//os.Getenv("CODE_LENGTH")
+	if size := os.Getenv("CODE_SIZE"); size != "" {
+		s, err := strconv.Atoi(size)
+		check(err)
+		codeSize = s
+	} else {
+		codeSize = defaultCodeSize
+	}
+
+	fmt.Printf("code size = %d\n", codeSize)
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -59,7 +71,7 @@ func saveInFile(code string) {
 
 func main() {
 	for {
-		saveInFile(randomGenerator(64))
+		saveInFile(randomGenerator(codeSize))
 		time.Sleep(2 * time.Second)
 	}
 }
