@@ -1,8 +1,9 @@
-FROM golang:alpine
-WORKDIR /go/src/code-generator
+FROM golang:alpine as builder
+WORKDIR /go/src/app
 COPY . .
+RUN go build -o generator .
 
-RUN go get -d -v .
-RUN go install -v .
-
-CMD ["code-generator"]
+FROM alpine
+WORKDIR /app
+COPY --from=builder /go/src/app/generator /app/
+CMD ["./generator"]
