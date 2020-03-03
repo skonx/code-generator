@@ -3,10 +3,16 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"strings"
 	"time"
 )
 
 const base = "0123456789_-.AZERTYUIOPMLKJHGFDSQWXCVBNazertyuiopmlkjhgfdsqwxcvbn"
+
+const path = "/tmp/secret-code/"
+const filename = "password.key"
+const filepath = path + filename
 
 func check(e error) {
 	if e != nil {
@@ -16,16 +22,43 @@ func check(e error) {
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	err := os.Mkdir(path, os.ModePerm)
+
+	if err != nil {
+		if os.IsExist(err) {
+			fmt.Printf("\033[1;33mDirectory %s already exist!\033[0m\n", path)
+		} else {
+			check(err)
+		}
+	} else {
+		fmt.Printf("Directory %s did not exist and will be created.\n", path)
+	}
 }
 
 func randomGenerator(size int) string {
-	b := make([]byte, size)
-	for i := range b {
-		b[i] = base[rand.Intn(len(base))]
+	sb := strings.Builder{}
+	for i := 0; i < size; i++ {
+		sb.WriteByte(base[rand.Intn(len(base))])
 	}
-	return string(b)
+	return sb.String()
+}
+
+func save(code string) {
+	f, err := os.Create(filepath)
+	check(err)
+	defer f.Close()
+
+	f.WriteString(code)
+	f.Sync()
+	t := time.Now()
+	fmt.Println(t.String())
+	fmt.Printf("Code \033[1;31m%s\033[0m written in file \033[1;34m%s\033[0m\n", code, filepath)
 }
 
 func main() {
-	fmt.Println(randomGenerator(16))
+	for {
+		save(randomGenerator(64))
+		time.Sleep(2 * time.Second)
+	}
 }
