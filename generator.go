@@ -44,7 +44,7 @@ func randomGenerator(size int) string {
 	return sb.String()
 }
 
-func save(code string) {
+func saveInFile(code string) {
 	f, err := os.Create(filepath)
 	check(err)
 	defer f.Close()
@@ -56,7 +56,7 @@ func save(code string) {
 
 func main() {
 	for {
-		save(randomGenerator(64))
+		saveInFile(randomGenerator(64))
 		time.Sleep(2 * time.Second)
 	}
 }
