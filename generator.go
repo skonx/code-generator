@@ -21,6 +21,9 @@ func check(e error) {
 }
 
 func init() {
+
+	//os.Getenv("CODE_LENGTH")
+
 	rand.Seed(time.Now().UnixNano())
 
 	err := os.Mkdir(path, os.ModePerm)
