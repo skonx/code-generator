@@ -27,12 +27,12 @@ func init() {
 
 	if err != nil {
 		if os.IsExist(err) {
-			fmt.Printf("\033[1;33mDirectory %s already exist!\033[0m\n", path)
+			fmt.Printf("\033[1;33mDirectory \"%s\" already exists\033[0m\n", path)
 		} else {
 			check(err)
 		}
 	} else {
-		fmt.Printf("Directory %s did not exist and will be created.\n", path)
+		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and will be created :)\033[0m\n", path)
 	}
 }
 
@@ -51,9 +51,7 @@ func save(code string) {
 
 	f.WriteString(code)
 	f.Sync()
-	t := time.Now()
-	fmt.Println(t.String())
-	fmt.Printf("Code \033[1;31m%s\033[0m written in file \033[1;34m%s\033[0m\n", code, filepath)
+	fmt.Printf("%s : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", time.Now().String(), code, filepath)
 }
 
 func main() {
