@@ -24,8 +24,7 @@ func check(e error) {
 	}
 }
 
-func init() {
-
+func controlEnvs() {
 	if size := os.Getenv("CODE_SIZE"); size != "" {
 		s, err := strconv.Atoi(size)
 		check(err)
@@ -35,6 +34,11 @@ func init() {
 	}
 
 	fmt.Printf("code size = %d\n", codeSize)
+}
+
+func init() {
+
+	controlEnvs()
 
 	rand.Seed(time.Now().UnixNano())
 
