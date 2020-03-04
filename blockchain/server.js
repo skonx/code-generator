@@ -8,6 +8,7 @@ var crypto = require('crypto');
 const app = express();
 app.use(morgan("dev"));
 
+//use map instead 
 const blockchain = [];
 
 JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'))

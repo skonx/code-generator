@@ -59,12 +59,12 @@ func saveInFile(secret *Secret) {
 
 	f.Write(jsonObject)
 	f.Sync()
-	fmt.Printf("%s : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", time.Now().String(), secret.Code, filepath)
+	fmt.Printf("%d : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", secret.Timestamp, secret.Code, filepath)
 }
 
 func main() {
 	for {
 		saveInFile(randomGenerator(codeSize))
-		time.Sleep(time.Duration(delay) * time.Second)
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }
