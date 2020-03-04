@@ -54,6 +54,6 @@ func saveInFile(code string) {
 func main() {
 	for {
 		saveInFile(randomGenerator(codeSize))
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Duration(delay) * time.Second)
 	}
 }
