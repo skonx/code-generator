@@ -2,7 +2,7 @@
 
 ### Local usage
 ```shell
-go build generator.go
+go build -o generator main.go
 ./generator
 go clean
 ```
