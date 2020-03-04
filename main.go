@@ -4,39 +4,17 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
 
-const base = "0123456789_-.AZERTYUIOPMLKJHGFDSQWXCVBNazertyuiopmlkjhgfdsqwxcvbn"
-
 const path = "/tmp/secret-code/"
 const filename = "password.key"
 const filepath = path + filename
-const defaultCodeSize = 64
-
-var codeSize int
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func controlEnvs() {
-	if size := os.Getenv("CODE_SIZE"); size != "" {
-		s, err := strconv.Atoi(size)
-		check(err)
-		codeSize = s
-	} else {
-		codeSize = defaultCodeSize
-	}
-
-	fmt.Printf("code size = %d\n", codeSize)
-}
 
 func init() {
+
+	fmt.Printf("\033[1;35m*** Starting %s ***\033[0m\n", os.Args[0])
 
 	controlEnvs()
 
@@ -58,7 +36,7 @@ func init() {
 func randomGenerator(size int) string {
 	sb := strings.Builder{}
 	for i := 0; i < size; i++ {
-		sb.WriteByte(base[rand.Intn(len(base))])
+		sb.WriteByte(Base[rand.Intn(len(Base))])
 	}
 	return sb.String()
 }
