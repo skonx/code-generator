@@ -10,7 +10,7 @@ import (
 const (
 	Base            = "0123456789_-.AZERTYUIOPMLKJHGFDSQWXCVBNazertyuiopmlkjhgfdsqwxcvbn"
 	DefaultCodeSize = 64
-	DefaultDelay    = 10
+	DefaultDelay    = 2
 )
 
 var codeSize int

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -9,7 +10,7 @@ import (
 )
 
 const path = "/tmp/secret-code/"
-const filename = "password.key"
+const filename = "secret.json"
 const filepath = path + filename
 
 func init() {
@@ -33,22 +34,32 @@ func init() {
 	}
 }
 
-func randomGenerator(size int) string {
+func randomGenerator(size int) *Secret {
 	sb := strings.Builder{}
 	for i := 0; i < size; i++ {
 		sb.WriteByte(Base[rand.Intn(len(Base))])
 	}
-	return sb.String()
+
+	secret := Secret{
+		Code:      sb.String(),
+		Timestamp: time.Now().UnixNano(),
+		Delay:     delay,
+	}
+
+	return &secret
 }
 
-func saveInFile(code string) {
+func saveInFile(secret *Secret) {
 	f, err := os.Create(filepath)
 	check(err)
 	defer f.Close()
 
-	f.WriteString(code)
+	jsonObject, err := json.MarshalIndent(&secret, "", "    ") //indent with 4 spaces
+	check(err)
+
+	f.Write(jsonObject)
 	f.Sync()
-	fmt.Printf("%s : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", time.Now().String(), code, filepath)
+	fmt.Printf("%s : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", time.Now().String(), secret.Code, filepath)
 }
 
 func main() {
