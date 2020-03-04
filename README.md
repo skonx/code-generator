@@ -11,4 +11,6 @@ go clean
 `docker build -t trendev/code-generator . && docker push trendev/code-generator`
 
 #### Run
+`docker build -t trendev/code-generator . && docker run -it --rm trendev/code-generator`
+
 `docker run -e CODE_SIZE=8 -it --rm trendev/code-generator`
