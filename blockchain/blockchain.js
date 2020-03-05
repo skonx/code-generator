@@ -49,6 +49,7 @@ function hash_block(block) {
 function create_block(content) {
     const block = {
         content: content,
+        //TODO : use process.hrtime() https://nodejs.org/docs/latest-v12.x/api/process.html#process_process_hrtime_time
         timestamp: new Date().getTime(),
         previous_hash: map.last_hash
     };
