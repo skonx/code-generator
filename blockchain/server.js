@@ -7,7 +7,7 @@ blockchain.init();
 const app = express();
 app.use(morgan("dev"));
 
-app.get("/", (req,res) => res.send(blockchain.map));
+app.get("/", (req, res) => res.send(blockchain.map));
 
 const port = process.env.PORT || 9000;
-app.listen(port, () => console.log(`NodeJS server listening on port ${port}`));
+app.listen(port, () => console.log("\033[1;33mNodeJS server listening on port " + port + "\033[0m"));
