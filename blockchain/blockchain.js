@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 
-const map = { last_hash: 0, blocks: {} };
+const map = { blocks: {} };
 const cipher_algorithm = 'aes-192-cbc';
 const salt = 'tR3ndEv_';
 
@@ -25,8 +25,7 @@ function init_cipher(code) {
     return { key, iv };
 }
 
-function encrypt(value) {
-    const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
+function encrypt(value, secret) {
     const { key, iv } = init_cipher(secret.code);
     const cipher = crypto.createCipheriv(cipher_algorithm, key, iv);
     let encrypted = cipher.update(value, 'utf8', 'hex');
@@ -35,7 +34,7 @@ function encrypt(value) {
 }
 
 function unencrypt(encrypted, secret) {
-    const { key, iv } = init_cipher(secret);
+    const { key, iv } = init_cipher(secret.code);
     const decipher = crypto.createDecipheriv(cipher_algorithm, key, iv);
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
@@ -47,9 +46,9 @@ function hash_block(block) {
     return hash.update(JSON.stringify(block), 'utf-8').digest('hex');
 }
 
-function create_block(data) {
+function create_block(content) {
     const block = {
-        content: encrypt(data),
+        content: content,
         timestamp: new Date().getTime(),
         previous_hash: map.last_hash
     };
@@ -58,23 +57,43 @@ function create_block(data) {
 
 function saveInChain(data) {
     console.log(`Saving data : ${data}`);
-    const block = create_block(data);
+
+    const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
+    const content = encrypt(data, secret);
+    console.log('Data : \033[5;32mencrypted\033[0m');
+
+    const block = create_block(content);
     const h = hash_block(block);
+    console.log(`Block hash : ${h}`);
+
     map.last_hash = h;
     map.blocks[h] = block;
+
+    console.log('Blockchain : \033[5;32mupdated\033[0m')
+
+    return { secret, h }
 }
 
 function init() {
 
     console.log("\033[5;33mBlockchain initialization...\033[0m");
 
-    saveInChain('block-0');
+    const n_seed = 3;
 
-    for (let i = 1; i <= 5; i++) {
-        saveInChain(`block-${i}`);
+    const uncrypted = []
+
+    for (let i = 0; i < n_seed; i++) {
+        uncrypted.push(saveInChain(JSON.stringify({ data: `seed-${i}` })));
     }
 
-    console.log("\033[1;33mBlockchain initialized !\033[0m");
+    if (uncrypted
+        .filter(({ secret, h }, i) => JSON.stringify({ data: `seed-${i}` }) === unencrypt(map.blocks[h].content, secret))
+        .length === n_seed) {
+        console.log("Blockchain : \033[1;32minitialized\033[0m");
+    } else {
+        console.log("Blockchain : \033[1;31m not initialized\033[0m");
+        throw Error("Error occurs during blockchain initialization");
+    }
 }
 
 module.exports = {
