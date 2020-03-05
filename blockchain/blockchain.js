@@ -75,17 +75,40 @@ function saveInChain(data) {
 }
 
 function control_bc_integrity() {
-
+    console.log("\033[5;33mControlling blockchain integrity...\033[0m");
     if (Object.keys(map.blocks).length > 1) {
-        let current_hash = map.last_hash;
-        let previous_hash = map.blocks[map.last_hash].previous_hash;
-        while (previous_hash !== 0) {
-            console.log(`controlling block integrity - hash : ${previous_hash}`);
-            let previous_block = map.blocks[previous_hash];
+        let next_hash = map.last_hash;
+        let current_hash = map.blocks[map.last_hash].previous_hash;
+        while (current_hash !== 0) {
+            console.log(`controlling block integrity - hash : ${current_hash}`);
+            const block = map.blocks[current_hash];
+            const h = hash_block(block);
+            if (h !== current_hash) {
+                throw Error(`Corruption detected - the computed hash and the stored hash are different :\n${h}\n${current_hash}`);
+            }
 
-            previous_hash = previous_block.previous_hash;
+            const next_block = map.blocks[next_hash];
+
+            if (h !== next_block.previous_hash) {
+                throw Error(`Corruption detected - the computed hash and the previous hash stored in the next block are different :\n${h}\n${next_block.previous_hash}`);
+            }
+
+            const hash_next_block = hash_block({
+                content: next_block.content,
+                timestamp: next_block.timestamp,
+                previous_hash: h
+            });
+
+            if (hash_next_block !== next_hash) {
+                throw Error(`Corruption detected - the computed hash of the next block and the next block hash are different :\n${hash_next_block}\n${next_hash}`);
+            }
+
+            console.log("block " + current_hash + " : \033[5;32mOK\033[0m")
+            current_hash = block.previous_hash;
+            next_hash = next_block.previous_hash;
         }
     }
+    console.log("Blockchain integrity: \033[1;32mOK\033[0m");
 }
 
 function init() {
