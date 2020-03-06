@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 
-const NS_PER_SEC = 1e9;
+const { NS_PER_SEC } = require('./nano');
 
 const map = { blocks: {}, last_hash: 0, performances: {} };
 const cipher_algorithm = 'aes-192-cbc';
@@ -35,7 +35,7 @@ function encrypt(value, secret) {
     return encrypted;
 }
 
-function unencrypt(encrypted, secret) {
+function decrypt(encrypted, secret) {
     const { key, iv } = init_cipher(secret.code);
     const decipher = crypto.createDecipheriv(cipher_algorithm, key, iv);
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
@@ -66,12 +66,12 @@ function update(data) {
     const encrypt_time = process.hrtime(start_time);
     console.log('Data : \033[5;32mencrypted\033[0m');
 
-    
+
     const start_hash_time = process.hrtime();
     const block = create_block(content);
     const h = hash_block(block);
     const hash_time = process.hrtime(start_hash_time);
-    
+
     console.log(`Block hash : ${h}`);
 
     // add the block and update the hash reference
@@ -132,20 +132,20 @@ function init() {
 
     console.log("\033[5;33mBlockchain initialization...\033[0m");
 
-    const n_seed = 3;
+    const n_seed = process.env.N_SEED || 3;
 
-    const unencrypted = [];
+    const decrypted = [];
 
     // add n_seed blocks
     for (let i = 0; i < n_seed; i++) {
-        unencrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
+        decrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
     }
 
     console.log("\033[5;33mControlling blockchain content encryption...\033[0m");
-    // control the unencrypted content of the block
-    if (unencrypted
+    // control the decrypted content of the block
+    if (decrypted
         .filter(({ secret, h }, i) => {
-            const result = JSON.stringify({ data: `seed-${i}` }) === unencrypt(map.blocks[h].content, secret);
+            const result = JSON.stringify({ data: `seed-${i}` }) === decrypt(map.blocks[h].content, secret);
             console.log("Encryption of block " + h + " : " + (result ? "\033[1;32mOK\033[0m" : "\033[1;31mError\033[0m"));
             return result;
         })
@@ -163,5 +163,5 @@ function init() {
 module.exports = {
     map,
     init,
-    unencrypt
+    decrypt
 };
