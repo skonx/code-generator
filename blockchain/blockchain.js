@@ -62,23 +62,30 @@ function create_block(content) {
 function update(data) {
     console.log(`Saving data : ${data}`);
 
-    const time = process.hrtime();
-    
+    const start_time = process.hrtime();
     const content = encrypt(data, secret);
+    const encrypt_time = process.hrtime(start_time);
     console.log('Data : \033[5;32mencrypted\033[0m');
 
+    
+    const start_hash_time = process.hrtime();
     const block = create_block(content);
     const h = hash_block(block);
+    const hash_time = process.hrtime(start_hash_time);
+    
     console.log(`Block hash : ${h}`);
 
     // add the block and update the hash reference
     map.last_hash = h;
     map.blocks[h] = block;
 
-    // compute process time
-    const diff = process.hrtime(time);
-    console.log(`${diff}`);
-    map.performances[h] = `${diff[0] * NS_PER_SEC + diff[1]}`;
+    const update_time = process.hrtime(start_time);
+
+    map.performances[h] = {
+        encrypt_time: `${encrypt_time[0] * NS_PER_SEC + encrypt_time[1]}`,
+        hash_time: `${hash_time[0] * NS_PER_SEC + hash_time[1]}`,
+        update_time: `${update_time[0] * NS_PER_SEC + update_time[1]}`
+    };
 
     console.log('Blockchain : \033[5;32mupdated\033[0m');
 
@@ -114,7 +121,7 @@ function control_bc_integrity() {
                 throw Error(`Corruption detected - the computed hash of the next block and the next block hash are different :\n${hash_next_block}\n${next_hash}`);
             }
 
-            console.log("block " + current_hash + " : \033[5;32mOK\033[0m")
+            console.log("Block " + current_hash + " : \033[5;32mOK\033[0m")
             current_hash = block.previous_hash;
             next_hash = next_block.previous_hash;
         }
@@ -126,7 +133,7 @@ function init() {
 
     console.log("\033[5;33mBlockchain initialization...\033[0m");
 
-    const n_seed = 500;
+    const n_seed = 3;
 
     const uncrypted = [];
 
@@ -135,10 +142,17 @@ function init() {
         uncrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
     }
 
+    console.log("\033[5;33mControlling blockchain content encryption...\033[0m");
     // control the unencrypted content of the block
     if (uncrypted
-        .filter(({ secret, h }, i) => JSON.stringify({ data: `seed-${i}` }) === unencrypt(map.blocks[h].content, secret))
+        .filter(({ secret, h }, i) => {
+            const result = JSON.stringify({ data: `seed-${i}` }) === unencrypt(map.blocks[h].content, secret);
+            console.log("Encryption of block " + h + " : " + (result ? "\033[1;32mOK\033[0m" : "\033[1;31mError\033[0m"));
+            return result;
+        })
+
         .length === n_seed) {
+        console.log("Blockchain encryption: \033[1;32mOK\033[0m");
         control_bc_integrity();
         console.log("Blockchain : \033[1;32minitialized\033[0m");
     } else {
