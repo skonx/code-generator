@@ -7,8 +7,6 @@ const map = { blocks: {}, last_hash: 0, performances: {} };
 const cipher_algorithm = 'aes-192-cbc';
 const salt = 'tR3ndEv_';
 
-const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
-
 function generate_iv(code) {
     if (code.length >= 16) {
         return code.substring(0, 16);
@@ -63,6 +61,7 @@ function update(data) {
     console.log(`Saving data : ${data}`);
 
     const start_time = process.hrtime();
+    const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
     const content = encrypt(data, secret);
     const encrypt_time = process.hrtime(start_time);
     console.log('Data : \033[5;32mencrypted\033[0m');
