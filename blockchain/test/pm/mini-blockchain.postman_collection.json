@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "4f7ba50c-8210-4927-be24-e552632412f6",
+		"name": "mini-blockchain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "blockchain",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3fc1439c-9d68-4437-b66a-7dc815396725",
+						"exec": [
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Blockchain is OK...\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    const blocks = jsonData.blocks;",
+							"    pm.expect(blocks).is.not.undefined;",
+							"    pm.expect(Object.keys(blocks).length).to.not.equal(0);",
+							"    pm.expect(jsonData.last_hash).is.not.undefined;",
+							"    pm.expect(Object.keys(jsonData.performances).length).to.not.equal(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "save",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27e98884-7372-43b8-a638-4615a1ce9467",
+						"exec": [
+							"pm.test(\"Status code is 201\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"secret.code is defined\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var code = jsonData.secret.code;",
+							"    pm.expect(code).is.not.undefined;",
+							"    pm.environment.set(\"secret_code\", code);",
+							"});",
+							"",
+							"pm.test(\"hash is defined\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var hash = jsonData.hash;",
+							"    pm.expect(hash).is.not.undefined;",
+							"    pm.environment.set(\"hash\", hash);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3e025617-2662-481e-99c0-d963394bb1f5",
+						"exec": [
+							"pm.environment.set(\"data\", \"TRENDev_\"+Date.now());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"data\": \"{{data}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9000/save",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"save"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e7136e60-7909-4a30-a9b0-1175e1a5ba71",
+						"exec": [
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"data is decrypted\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.equal(pm.environment.get(\"data\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Block-Hash",
+						"value": "{{hash}}",
+						"type": "text"
+					},
+					{
+						"key": "Secret-Code",
+						"value": "{{secret_code}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9000/content",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"content"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
