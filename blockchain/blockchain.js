@@ -62,7 +62,24 @@ function update(data) {
     console.log(`Saving data : ${data}`);
 
     const start_time = process.hrtime();
-    const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
+    let try_read = 0;
+    const try_read_limit = 3;
+    let secret;
+    while (try_read < try_read_limit) {
+        try {
+            secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
+            try_read = try_read_limit;
+        } catch (error) {
+            console.error(error);
+            try_read++;
+        }
+    }
+
+    if(!secret){
+        throw Error ("secret cannot be read from shared file");
+    }
+
+    
     const content = encrypt(data, secret);
     const encrypt_time = process.hrtime(start_time);
     console.log('Data : \033[5;32mencrypted\033[0m');
@@ -92,7 +109,7 @@ function update(data) {
     return { secret, h }
 }
 
-function control_bc_integrity() {
+function control_integrity() {
     console.log("\033[5;33mControlling blockchain integrity...\033[0m");
     if (Object.keys(map.blocks).length > 1) {
         let next_hash = map.last_hash;
@@ -153,7 +170,7 @@ function init() {
 
         .length === n_seed) {
         console.log("Blockchain encryption: \033[1;32mOK\033[0m");
-        control_bc_integrity();
+        control_integrity();
         console.log("Blockchain : \033[1;32minitialized\033[0m");
     } else {
         console.log("Blockchain : \033[1;31mnot initialized\033[0m");
@@ -165,5 +182,6 @@ module.exports = {
     map,
     init,
     decrypt,
-    update
+    update,
+    control_integrity
 };
