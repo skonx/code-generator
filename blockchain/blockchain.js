@@ -134,16 +134,16 @@ function init() {
 
     const n_seed = 3;
 
-    const uncrypted = [];
+    const unencrypted = [];
 
     // add n_seed blocks
     for (let i = 0; i < n_seed; i++) {
-        uncrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
+        unencrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
     }
 
     console.log("\033[5;33mControlling blockchain content encryption...\033[0m");
     // control the unencrypted content of the block
-    if (uncrypted
+    if (unencrypted
         .filter(({ secret, h }, i) => {
             const result = JSON.stringify({ data: `seed-${i}` }) === unencrypt(map.blocks[h].content, secret);
             console.log("Encryption of block " + h + " : " + (result ? "\033[1;32mOK\033[0m" : "\033[1;31mError\033[0m"));
@@ -162,5 +162,6 @@ function init() {
 
 module.exports = {
     map,
-    init
+    init,
+    unencrypt
 };
