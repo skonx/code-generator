@@ -67,7 +67,6 @@ app.post("/save", (req, res) => {
             status: 'error',
             message: 'content cannot be saved in blockchain'
         });
-        process.exit(1);
     }
 });
 
