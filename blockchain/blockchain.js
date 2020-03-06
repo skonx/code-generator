@@ -1,9 +1,13 @@
 const crypto = require('crypto');
 const fs = require('fs');
 
-const map = { blocks: {}, last_hash: 0 };
+const NS_PER_SEC = 1e9;
+
+const map = { blocks: {}, last_hash: 0, performances: {} };
 const cipher_algorithm = 'aes-192-cbc';
 const salt = 'tR3ndEv_';
+
+const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
 
 function generate_iv(code) {
     if (code.length >= 16) {
@@ -55,10 +59,11 @@ function create_block(content) {
     return block;
 }
 
-function saveInChain(data) {
+function update(data) {
     console.log(`Saving data : ${data}`);
 
-    const secret = JSON.parse(fs.readFileSync('/tmp/secret-code/secret.json'));
+    const time = process.hrtime();
+    
     const content = encrypt(data, secret);
     console.log('Data : \033[5;32mencrypted\033[0m');
 
@@ -66,10 +71,16 @@ function saveInChain(data) {
     const h = hash_block(block);
     console.log(`Block hash : ${h}`);
 
+    // add the block and update the hash reference
     map.last_hash = h;
     map.blocks[h] = block;
 
-    console.log('Blockchain : \033[5;32mupdated\033[0m')
+    // compute process time
+    const diff = process.hrtime(time);
+    console.log(`${diff}`);
+    map.performances[h] = `${diff[0] * NS_PER_SEC + diff[1]}`;
+
+    console.log('Blockchain : \033[5;32mupdated\033[0m');
 
     return { secret, h }
 }
@@ -115,13 +126,13 @@ function init() {
 
     console.log("\033[5;33mBlockchain initialization...\033[0m");
 
-    const n_seed = 5;
+    const n_seed = 500;
 
-    const uncrypted = []
+    const uncrypted = [];
 
     // add n_seed blocks
     for (let i = 0; i < n_seed; i++) {
-        uncrypted.push(saveInChain(JSON.stringify({ data: `seed-${i}` })));
+        uncrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
     }
 
     // control the unencrypted content of the block
