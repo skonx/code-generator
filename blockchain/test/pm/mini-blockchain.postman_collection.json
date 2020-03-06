@@ -22,9 +22,14 @@
 							"    const blocks = jsonData.blocks;",
 							"    pm.expect(blocks).is.not.undefined;",
 							"    pm.expect(Object.keys(blocks).length).to.not.equal(0);",
+							"    console.log(Object.keys(blocks).length + \" blocks\");",
 							"    pm.expect(jsonData.last_hash).is.not.undefined;",
 							"    pm.expect(Object.keys(jsonData.performances).length).to.not.equal(0);",
-							"});"
+							"});",
+							"",
+							"pm.test(\"Blockchain with \" + Object.keys(pm.response.json().blocks).length + \" blocks\", function() {",
+							"",
+							"})"
 						],
 						"type": "text/javascript"
 					}
@@ -161,6 +166,39 @@
 					"port": "9000",
 					"path": [
 						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "control-integrity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b18e6d1-d52c-4c3c-95c6-5107d77b6287",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9000/control-integrity",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"control-integrity"
 					]
 				}
 			},

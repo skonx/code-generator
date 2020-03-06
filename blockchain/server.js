@@ -41,6 +41,19 @@ app.get("/content", (req, res) => {
     }
 });
 
+app.get("/control-integrity",(req,res) => {
+    try{
+        blockchain.control_integrity();
+        res.send();
+    }catch (error){
+        console.error(error);
+        res.json({
+            status:'error',
+            message: 'Blockchain integrity : corrupted'
+        });
+    }
+});
+
 app.get("/", (req, res) => res.send(blockchain.map));
 
 app.post("/save", (req, res) => {
@@ -54,6 +67,7 @@ app.post("/save", (req, res) => {
             status: 'error',
             message: 'content cannot be saved in blockchain'
         });
+        process.exit(1);
     }
 });
 
