@@ -58,6 +58,7 @@ function create_block(content) {
 }
 
 function update(data) {
+    data = JSON.stringify(data);
     console.log(`Saving data : ${data}`);
 
     const start_time = process.hrtime();
@@ -138,7 +139,7 @@ function init() {
 
     // add n_seed blocks
     for (let i = 0; i < n_seed; i++) {
-        decrypted.push(update(JSON.stringify({ data: `seed-${i}` })));
+        decrypted.push(update({ data: `seed-${i}` }));
     }
 
     console.log("\033[5;33mControlling blockchain content encryption...\033[0m");
@@ -163,5 +164,6 @@ function init() {
 module.exports = {
     map,
     init,
-    decrypt
+    decrypt,
+    update
 };

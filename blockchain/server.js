@@ -1,6 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
-
+const bodyParser = require('body-parser');
 const blockchain = require('./blockchain');
 const { NS_PER_SEC } = require('./nano');
 
@@ -8,7 +8,7 @@ blockchain.init();
 
 const app = express();
 app.use(morgan("dev"));
-
+app.use(bodyParser.json());
 app.get("/content", (req, res) => {
     const hash = req.header("Block-Hash");
     const code = req.header("Secret-Code");
@@ -42,6 +42,20 @@ app.get("/content", (req, res) => {
 });
 
 app.get("/", (req, res) => res.send(blockchain.map));
+
+app.post("/save", (req, res) => {
+    const body = req.body;
+    try {
+        const { secret, h: hash} = blockchain.update(body);
+        res.status(201).json({ secret, hash });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            message: 'content cannot be saved in blockchain'
+        });
+    }
+});
 
 const port = process.env.PORT || 9000;
 app.listen(port, () => console.log("\033[1;34mNodeJS server listening on port " + port + "\033[0m"));
