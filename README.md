@@ -42,7 +42,8 @@ You've to apply the content of `k8s/` folder:
 - create the `Pod` with 2 containers `code-generator` and `blockchain`
 
 ## Test with postman (newman)
-Test settings can be edited in order to reflect your own configuration
+Test settings can be edited in order to reflect your own configuration:
+- edit the value `URL` in the file `mini-blockchain.postman_environment.json` with your NodePort settings (http://{NodeIP}:{NodePort})
 > test files are located in blockchain > test > pm
 
 `newman run mini-blockchain.postman_collection.json -e mini-blockchain.postman_environment.json -n 100`
