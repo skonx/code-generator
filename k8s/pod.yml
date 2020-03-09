@@ -20,7 +20,7 @@ spec:
         - name: CODE_SIZE
           value: "64"
         - name: DELAY
-          value: "2000"
+          value: "100"
       resources: {}
     - image: trendev/blockchain
       imagePullPolicy: Always
