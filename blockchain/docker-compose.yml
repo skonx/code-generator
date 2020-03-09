@@ -1,0 +1,8 @@
+version: "3"
+services:
+  helloworld:
+    build: .
+    image: trendev/blockchain
+    container_name: blockchain
+    ports:
+      - 9000:9000

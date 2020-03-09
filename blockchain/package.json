@@ -2,7 +2,7 @@
   "name": "blockchain",
   "version": "1.0.0",
   "private": true,
-  "description": "nodejs blockchain",
+  "description": "nodejs + go blockchain",
   "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
