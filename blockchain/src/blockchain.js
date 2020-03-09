@@ -155,7 +155,7 @@ function init() {
 
     console.log("\033[5;33mBlockchain initialization...\033[0m");
 
-    const n_seed = process.env.N_SEED || 3;
+    const n_seed = +process.env.N_SEED || 3; // convert N_SEED as number
 
     const decrypted = [];
 
@@ -172,7 +172,6 @@ function init() {
             console.log("Encryption of block " + h + " : " + (result ? "\033[1;32mOK\033[0m" : "\033[1;31mError\033[0m"));
             return result;
         })
-
         .length === n_seed) {
         console.log("Blockchain encryption: \033[1;32mOK\033[0m");
         control_integrity();
