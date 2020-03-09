@@ -2,8 +2,8 @@
 
 Have fun :blush: with Go, NodeJS and Kubernetes building a mini blockchain :
 - create a simple blockchain,
-- encrypt or get its secured content,
-- scale it, 
+- encrypt/decrypt its secured content,
+- scale and observe it, 
 - check integrity...
 
 The main purpose of this project is to **demonstrate how to communicate between containers in the same Pod using Kubernetes Shared Volumes**.
@@ -47,3 +47,8 @@ Test settings can be edited in order to reflect your own configuration:
 > test files are located in blockchain > test > pm
 
 `newman run mini-blockchain.postman_collection.json -e mini-blockchain.postman_environment.json -n 100`
+
+... and should get the following result :
+
+![result](https://user-images.githubusercontent.com/19473981/76232598-345d5580-6227-11ea-88e0-892019d64474.png)
+
