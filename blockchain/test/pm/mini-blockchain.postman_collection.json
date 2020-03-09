@@ -39,12 +39,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9000",
-					"protocol": "http",
+					"raw": "{{URL}}",
 					"host": [
-						"localhost"
-					],
-					"port": "9000"
+						"{{URL}}"
+					]
 				}
 			},
 			"response": []
@@ -109,12 +107,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:9000/save",
-					"protocol": "http",
+					"raw": "{{URL}}/save",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9000",
 					"path": [
 						"save"
 					]
@@ -158,12 +154,10 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:9000/content",
-					"protocol": "http",
+					"raw": "{{URL}}/content",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9000",
 					"path": [
 						"content"
 					]
@@ -191,12 +185,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9000/control-integrity",
-					"protocol": "http",
+					"raw": "{{URL}}/control-integrity",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9000",
 					"path": [
 						"control-integrity"
 					]
