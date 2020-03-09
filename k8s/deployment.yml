@@ -37,6 +37,7 @@ spec:
           volumeMounts:
             - name: shared-data
               mountPath: "/tmp/secret-code"
+              readOnly: true
           ports:
             - containerPort: 9000
           env:
