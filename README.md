@@ -8,7 +8,7 @@ Have fun :blush: with Go, NodeJS and Kubernetes building a mini blockchain :
 
 The main purpose of this project is to **demonstrate how to communicate between containers in the same Pod using Kubernetes Shared Volumes**.
 
-> disclaimer : this project is used during TRENDev's workshops and demonstrations.
+> disclaimer : this project is used during **TRENDev's workshops and demonstrations**.
 
 ## Build code-generator 
 `code-generator` is a Go micro-service continuously generating random secret codes in a JSON file.
@@ -40,6 +40,8 @@ You've to apply the content of `k8s/` folder:
 - create the `Namespace`
 - create the `NodePort Service`
 - create the `Pod` with 2 containers `code-generator` and `blockchain`
+
+![config](https://user-images.githubusercontent.com/19473981/76245530-57463480-623c-11ea-8410-be5deb673dd7.png)
 
 ## Test with postman (newman)
 Test settings can be edited in order to reflect your own configuration:
