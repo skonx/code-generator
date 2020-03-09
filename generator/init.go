@@ -37,5 +37,5 @@ func controlIntEnvVar(env string, msg string, value *int, defaultValue int) {
 func controlEnvs() {
 	fmt.Println("Control command line arguments and set global settings :")
 	controlIntEnvVar("CODE_SIZE", "code size", &codeSize, DefaultCodeSize)
-	controlIntEnvVar("DELAY", "delay (seconds)", &delay, DefaultDelay)
+	controlIntEnvVar("DELAY", "delay (ms)", &delay, DefaultDelay)
 }
