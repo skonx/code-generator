@@ -29,8 +29,17 @@ Before a block is created and added in the chain, its content is encrypted with 
 Then, when the block is added, the secret code is provided in the HTTP response.
 As the secret code is changed many times in a second, if the provided secret code is lost, the block content cannot be decrypted...
 
+The blockchain is initialized with few first blocks.
+The number of the first seeds (N_SEED) and the port of the API services (PORT) can be set as Environment variables.
+
 #### docker commands
 `docker build -t trendev/blockchain . && docker push trendev/blockchain`
+
+## Deploy on a Kubernetes Cluster
+You've to apply the content of `k8s/` folder:
+- create the `Namespace`
+- create the `NodePort Service`
+- create the `Pod` with 2 containers `code-generator` and `blockchain`
 
 ## Test with postman (newman)
 Test settings can be edited in order to reflect your own configuration
