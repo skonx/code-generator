@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mini-blockchain
+  namespace: mini-blockchain
+  labels:
+    app: mini-blockchain
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9000
+  selector:
+    app: mini-blockchain
