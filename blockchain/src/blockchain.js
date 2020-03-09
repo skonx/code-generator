@@ -75,11 +75,11 @@ function update(data) {
         }
     }
 
-    if(!secret){
-        throw Error ("secret cannot be read from shared file");
+    if (!secret) {
+        throw Error("secret cannot be read from shared file");
     }
 
-    
+
     const content = encrypt(data, secret);
     const encrypt_time = process.hrtime(start_time);
     console.log('Data : \033[5;32mencrypted\033[0m');
@@ -111,7 +111,7 @@ function update(data) {
 
 function control_integrity() {
     console.log("\033[5;33mControlling blockchain integrity...\033[0m");
-    if (Object.keys(map.blocks).length > 1) {
+    if (Object.keys(map.blocks).length > 3) {
         let next_hash = map.last_hash;
         let current_hash = map.blocks[map.last_hash].previous_hash;
         while (current_hash !== 0) {
@@ -142,8 +142,13 @@ function control_integrity() {
             current_hash = block.previous_hash;
             next_hash = next_block.previous_hash;
         }
+        console.log("Blockchain integrity: \033[1;32mOK\033[0m");
+        return { blocks_count: Object.keys(map.blocks).length, partial: false };
+    } else {
+        console.log("Blockchain integrity: \033[1;35mpartial\033[0m");
+        return { blocks_count: Object.keys(map.blocks).length, partial: true };
     }
-    console.log("Blockchain integrity: \033[1;32mOK\033[0m");
+
 }
 
 function init() {

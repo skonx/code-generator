@@ -41,14 +41,26 @@ app.get("/content", (req, res) => {
     }
 });
 
-app.get("/control-integrity",(req,res) => {
-    try{
-        blockchain.control_integrity();
-        res.send();
-    }catch (error){
+app.get("/control-integrity", (req, res) => {
+    try {
+        const { blocks_count, partial } = blockchain.control_integrity();
+        if (partial) {
+            res.json({
+                integrity: 'partial',
+                message: 'not enough blocks',
+                blocks_count: blocks_count,
+            });
+        } else {
+            res.json({
+                integrity: 'compliant',
+                blocks_count: blocks_count
+            });
+        }
+
+    } catch (error) {
         console.error(error);
         res.json({
-            status:'error',
+            status: 'error',
             message: 'Blockchain integrity : corrupted'
         });
     }
@@ -59,7 +71,7 @@ app.get("/", (req, res) => res.send(blockchain.map));
 app.post("/save", (req, res) => {
     const body = req.body;
     try {
-        const { secret, h: hash} = blockchain.update(body);
+        const { secret, h: hash } = blockchain.update(body);
         res.status(201).json({ secret, hash });
     } catch (error) {
         console.log(error);
