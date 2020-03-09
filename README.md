@@ -50,7 +50,7 @@ Test settings can be edited in order to reflect your own configuration:
 
 `newman run mini-blockchain.postman_collection.json -e mini-blockchain.postman_environment.json -n 100`
 
-... and should get the following result :
+... and you should get the following result :
 
 ![result](https://user-images.githubusercontent.com/19473981/76232598-345d5580-6227-11ea-88e0-892019d64474.png)
 
