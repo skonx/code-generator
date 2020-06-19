@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/trendev/pwdgen/generator"
+	cg "github.com/trendev/pwdgen/generator"
 )
 
 const path = "/tmp/secret-code/"
@@ -44,7 +44,7 @@ func init() {
 
 func createSecret(size int) *Secret {
 
-	code := generator.Generate(size)
+	code := cg.Generate(size)
 
 	secret := Secret{
 		Code:      code,
