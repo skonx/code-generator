@@ -8,7 +8,6 @@ import (
 
 // default and base values
 const (
-	Base            = "0123456789_-.AZERTYUIOPMLKJHGFDSQWXCVBNazertyuiopmlkjhgfdsqwxcvbn"
 	DefaultCodeSize = 64
 	DefaultDelay    = 200
 )

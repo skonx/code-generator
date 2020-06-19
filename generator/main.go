@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/trendev/pwdgen/generator"
 )
 
 const path = "/tmp/secret-code/"
@@ -44,7 +46,7 @@ func init() {
 func randomGenerator(size int) *Secret {
 	sb := strings.Builder{}
 	for i := 0; i < size; i++ {
-		sb.WriteByte(Base[rand.Intn(len(Base))])
+		sb.WriteByte(generator.Base[rand.Intn(len(generator.Base))])
 	}
 
 	secret := Secret{
