@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/trendev/pwdgen/generator"
@@ -34,7 +33,7 @@ func init() {
 			check(err)
 		}
 	} else {
-		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and is now created :)\033[0m\n", path)
+		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and is now created 👍\033[0m\n", path)
 	}
 
 	f, err := os.Create(backupFilepath)
@@ -43,14 +42,12 @@ func init() {
 
 }
 
-func randomGenerator(size int) *Secret {
-	sb := strings.Builder{}
-	for i := 0; i < size; i++ {
-		sb.WriteByte(generator.Base[rand.Intn(len(generator.Base))])
-	}
+func createSecret(size int) *Secret {
+
+	code := generator.Generate(size)
 
 	secret := Secret{
-		Code:      sb.String(),
+		Code:      code,
 		Timestamp: time.Now().UnixNano(),
 		Delay:     delay,
 	}
@@ -67,7 +64,7 @@ func saveInFile(secret *Secret) {
 	check(err)
 	defer bkf.Close()
 
-	jsonObject, err := json.MarshalIndent(&secret, "", "    ") //indent with 4 spaces
+	jsonObject, err := json.MarshalIndent(&secret, "", "\t") //indent with single tab
 	check(err)
 
 	f.Write(jsonObject)
@@ -81,7 +78,7 @@ func saveInFile(secret *Secret) {
 
 func main() {
 	for {
-		saveInFile(randomGenerator(codeSize))
+		saveInFile(createSecret(codeSize))
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }
