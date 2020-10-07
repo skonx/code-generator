@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -12,84 +10,61 @@ import (
 	cg "github.com/trendev/pwdgen/generator"
 )
 
-const path = "/tmp/secret-code/"
-const filename = "secret.json"
-const filepath = path + filename
-const backupFilepath = path + "secret.log"
+const dir = "/tmp/secret-code/"
+const file = dir + "secret.json"   // file with most recent secret
+const logfile = dir + "secret.log" // log file
 
 var codeSize int
-var delay int
+var delay int // delay (in ms) between each secret creation
 
 func checkError(e error) {
 	if e != nil {
-		panic(e)
+		panic(e) // just panic ;)
 	}
 }
 
-func getEnvVar(env string, msg string, value *int, dv int) {
-	if v := os.Getenv(env); v != "" {
+func initConst(
+	ev string, // environment var
+	l string, // const label
+	cst *int, // const to update
+	dv int) { // default value
+	if v := os.Getenv(ev); v != "" {
 		s, err := strconv.Atoi(v)
 		checkError(err)
-		*value = s
+		*cst = s
 	} else {
-		*value = dv
+		*cst = dv
 	}
 
-	fmt.Printf("- %s = %d\n", msg, *value)
+	fmt.Printf("- %s = %d\n", l, *cst)
 }
 
 func init() {
 	fmt.Printf("\033[1;35m*** Starting %s ***\033[0m\n", os.Args[0])
 
 	fmt.Println("Control command line arguments and set global settings :")
-	getEnvVar("CODE_SIZE", "code size", &codeSize, 64)
-	getEnvVar("DELAY", "delay (ms)", &delay, 200)
+	initConst("CODE_SIZE", "code size", &codeSize, 64)
+	initConst("DELAY", "delay (ms)", &delay, 200)
 
 	rand.Seed(time.Now().UnixNano())
 
-	err := os.Mkdir(path, os.ModePerm)
+	err := os.Mkdir(dir, os.ModePerm)
 
 	if err != nil {
 		if os.IsExist(err) {
-			fmt.Printf("\033[1;33mDirectory \"%s\" already exists\033[0m\n", path)
+			fmt.Printf("\033[1;33mDirectory \"%s\" already exists\033[0m\n", dir)
 		} else {
 			checkError(err)
 		}
 	} else {
-		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and is now created 👍\033[0m\n", path)
+		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and is now created 👍\033[0m\n", dir)
 	}
 
-	f, err := os.Create(backupFilepath)
+	// creates the log file
+	f, err := os.Create(logfile)
 	checkError(err)
 	defer f.Close()
 
-}
-
-type secret struct {
-	Code      string `json:"code"`
-	Timestamp int64  `json:"timestamp"` // nanosecond
-	Delay     int    `json:"delay"`     // second, just for fun
-}
-
-func (s secret) store() {
-	f, err := os.Create(filepath)
-	checkError(err)
-	defer f.Close()
-
-	bkf, err := os.OpenFile(backupFilepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	checkError(err)
-	defer bkf.Close()
-
-	jsonObject, err := json.MarshalIndent(&s, "", "\t") //indent with single tab
-	checkError(err)
-
-	f.Write(jsonObject)
-	f.Sync()
-
-	logger := log.New(bkf, "", log.LstdFlags)
-	logger.Println(fmt.Sprintf("- %d : %s", s.Timestamp, s.Code))
-
-	fmt.Printf("%d : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", s.Timestamp, s.Code, filepath)
 }
 
 func main() {
@@ -99,7 +74,7 @@ func main() {
 			time.Now().UnixNano(),
 			delay,
 		}
-		s.store()
+		s.store(file, logfile)
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }
