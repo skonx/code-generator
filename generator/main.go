@@ -14,37 +14,28 @@ const dir = "/tmp/secret-code/"
 const file = dir + "secret.json"   // file with most recent secret
 const logfile = dir + "secret.log" // log file
 
-var codeSize int
-var delay int // delay (in ms) between each secret creation
-
 func checkError(e error) {
 	if e != nil {
 		panic(e) // just panic ;)
 	}
 }
 
-func initConst(
-	ev string, // environment var
-	l string, // const label
-	cst *int, // const to update
-	dv int) { // default value
+func getFromEnvVar(ev string, l string, dv int) int {
+	var cst int
 	if v := os.Getenv(ev); v != "" {
 		s, err := strconv.Atoi(v)
 		checkError(err)
-		*cst = s
+		cst = s
 	} else {
-		*cst = dv
+		cst = dv
 	}
 
-	fmt.Printf("- %s = %d\n", l, *cst)
+	fmt.Printf("- %s = %d\n", l, cst)
+	return cst
 }
 
 func init() {
 	fmt.Printf("\033[1;35m*** Starting %s ***\033[0m\n", os.Args[0])
-
-	fmt.Println("Control command line arguments and set global settings :")
-	initConst("CODE_SIZE", "code size", &codeSize, 64)
-	initConst("DELAY", "delay (ms)", &delay, 200)
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -68,6 +59,11 @@ func init() {
 }
 
 func main() {
+
+	fmt.Println("Control command line arguments and set global settings :")
+	codeSize := getFromEnvVar("CODE_SIZE", "code size", 64)
+	delay := getFromEnvVar("DELAY", "delay (ms)", 200)
+
 	for {
 		s := secret{
 			cg.Generate(codeSize),
