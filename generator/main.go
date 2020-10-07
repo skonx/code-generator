@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	cg "github.com/trendev/pwdgen/generator"
@@ -16,11 +17,33 @@ const filename = "secret.json"
 const filepath = path + filename
 const backupFilepath = path + "secret.log"
 
-func init() {
+var codeSize int
+var delay int
 
+func checkError(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func getEnvVar(env string, msg string, value *int, dv int) {
+	if v := os.Getenv(env); v != "" {
+		s, err := strconv.Atoi(v)
+		checkError(err)
+		*value = s
+	} else {
+		*value = dv
+	}
+
+	fmt.Printf("- %s = %d\n", msg, *value)
+}
+
+func init() {
 	fmt.Printf("\033[1;35m*** Starting %s ***\033[0m\n", os.Args[0])
 
-	controlEnvs()
+	fmt.Println("Control command line arguments and set global settings :")
+	getEnvVar("CODE_SIZE", "code size", &codeSize, 64)
+	getEnvVar("DELAY", "delay (ms)", &delay, 200)
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -30,55 +53,53 @@ func init() {
 		if os.IsExist(err) {
 			fmt.Printf("\033[1;33mDirectory \"%s\" already exists\033[0m\n", path)
 		} else {
-			check(err)
+			checkError(err)
 		}
 	} else {
 		fmt.Printf("\033[1;32mDirectory \"%s\" did not exist and is now created 👍\033[0m\n", path)
 	}
 
 	f, err := os.Create(backupFilepath)
-	check(err)
+	checkError(err)
 	defer f.Close()
 
 }
 
-func createSecret(size int) *Secret {
-
-	code := cg.Generate(size)
-
-	secret := Secret{
-		Code:      code,
-		Timestamp: time.Now().UnixNano(),
-		Delay:     delay,
-	}
-
-	return &secret
+type secret struct {
+	Code      string `json:"code"`
+	Timestamp int64  `json:"timestamp"` // nanosecond
+	Delay     int    `json:"delay"`     // second, just for fun
 }
 
-func saveInFile(secret *Secret) {
+func (s secret) store() {
 	f, err := os.Create(filepath)
-	check(err)
+	checkError(err)
 	defer f.Close()
 
 	bkf, err := os.OpenFile(backupFilepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	check(err)
+	checkError(err)
 	defer bkf.Close()
 
-	jsonObject, err := json.MarshalIndent(&secret, "", "\t") //indent with single tab
-	check(err)
+	jsonObject, err := json.MarshalIndent(&s, "", "\t") //indent with single tab
+	checkError(err)
 
 	f.Write(jsonObject)
 	f.Sync()
 
 	logger := log.New(bkf, "", log.LstdFlags)
-	logger.Println(fmt.Sprintf("- %d : %s", secret.Timestamp, secret.Code))
+	logger.Println(fmt.Sprintf("- %d : %s", s.Timestamp, s.Code))
 
-	fmt.Printf("%d : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", secret.Timestamp, secret.Code, filepath)
+	fmt.Printf("%d : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", s.Timestamp, s.Code, filepath)
 }
 
 func main() {
 	for {
-		saveInFile(createSecret(codeSize))
+		s := secret{
+			cg.Generate(codeSize),
+			time.Now().UnixNano(),
+			delay,
+		}
+		s.store()
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }
