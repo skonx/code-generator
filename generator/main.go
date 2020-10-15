@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	cg "github.com/trendev/pwdgen/generator"
+	cg "github.com/trendev/go-pwdgen/generator"
 )
 
 const dir = "/tmp/secret-code/"
