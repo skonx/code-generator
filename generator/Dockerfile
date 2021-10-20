@@ -1,5 +1,5 @@
 # use goland:lastest instead of golang:alpine because go git is not available in alpine version
-FROM golang as builder
+FROM golang:1.15 as builder
 WORKDIR /go/src/generator
 COPY . .
 RUN go get -v -d

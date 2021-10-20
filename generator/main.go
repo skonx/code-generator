@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -13,6 +15,12 @@ import (
 const dir = "/tmp/secret-code/"
 const file = dir + "secret.json"   // file with most recent secret
 const logfile = dir + "secret.log" // log file
+
+type secret struct {
+	Code      string `json:"code"`
+	Timestamp int64  `json:"timestamp"` // in nanoseconds
+	Delay     int    `json:"delay"`     // in seconds, not really used... just for fun
+}
 
 func checkError(e error) {
 	if e != nil {
@@ -58,19 +66,41 @@ func init() {
 
 }
 
+func (s secret) store(file, logfile string) {
+	// creates the secret file
+	f, err := os.Create(file)
+	checkError(err)
+	defer f.Close()
+
+	// open the logfile
+	lf, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	checkError(err)
+	defer lf.Close()
+
+	jsonObject, err := json.MarshalIndent(&s, "", "\t") //indent with single tabs
+	checkError(err)
+
+	f.Write(jsonObject)
+	f.Sync()
+
+	logger := log.New(lf, "", log.LstdFlags)
+	logger.Println(fmt.Sprintf("- %d : %s", s.Timestamp, s.Code))
+
+	fmt.Printf("%d : code \033[1;31m%s\033[0m saved in file \033[1;34m%s\033[0m\n", s.Timestamp, s.Code, file)
+}
+
 func main() {
 
 	fmt.Println("Control command line arguments and set global settings :")
 	codeSize := getFromEnvVar("CODE_SIZE", "code size", 64)
 	delay := getFromEnvVar("DELAY", "delay (ms)", 200)
 
-	for {
+	for range time.Tick(time.Millisecond * time.Duration(delay)) {
 		s := secret{
 			cg.Generate(codeSize),
 			time.Now().UnixNano(),
 			delay,
 		}
 		s.store(file, logfile)
-		time.Sleep(time.Duration(delay) * time.Millisecond)
 	}
 }
